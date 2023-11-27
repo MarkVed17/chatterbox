@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import getAllMessages from '@/services/getAllMessages.service'
+import postMessage from '@/services/postMessage.service'
 import type { Message } from '@/types/message'
 
 const chatInput = ref('') // Text Input
@@ -18,6 +19,14 @@ async function fetchMessagesData() {
   chatBox.value.focus() // Focus on the Text Input element
 }
 
+// Post a message
+async function postMessageHandler() {
+  await postMessage({ text: chatInput.value })
+  await fetchMessagesData()
+
+  chatInput.value = '' // Clear the Text Input Field
+}
+
 onMounted(() => {
   fetchMessagesData()
 })
@@ -26,7 +35,7 @@ onMounted(() => {
 <template>
   <h1>Chatterbox</h1>
   <input ref="chatBox" type="text" v-model="chatInput" placeholder="Type your message..." />
-  <button :disabled="!chatInput.length">Post!</button>
+  <button @click="postMessageHandler" :disabled="!chatInput.length">Post!</button>
   <button :disabled="!messagesData.length">Delete All</button>
 
   <template v-if="isLoadingData">
