@@ -113,6 +113,28 @@ function toggleSort() {
   }
 }
 
+// Fromat the message timestamp relative to the current time
+function formatRelativeTime(timestamp: string) {
+  const currentDate = new Date()
+  const targetDate = new Date(timestamp)
+
+  const timeDifference = currentDate.getTime() - targetDate.getTime()
+  const seconds = Math.floor(timeDifference / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+
+  if (seconds < 60) {
+    return seconds + ' seconds ago'
+  } else if (minutes < 60) {
+    return minutes + ' minutes ago'
+  } else if (hours < 24) {
+    return hours + ' hours ago'
+  } else {
+    return days + ' days ago'
+  }
+}
+
 onMounted(() => {
   fetchMessagesData()
 })
@@ -120,13 +142,41 @@ onMounted(() => {
 
 <template>
   <h1>Chatterbox</h1>
-  <input ref="chatBox" type="text" v-model="chatInput" placeholder="Type your message..." />
-  <button @click="postMessageHandler" :disabled="!chatInput.length">Post!</button>
-  <button :disabled="!messagesData.length" @click="isDeleteAllModalOpen = true">Delete All</button>
-  <button v-if="checkedMessagesIds.length" @click="isDeleteSelectedModalOpen = true">
+  <div class="input-group mb-3">
+    <input
+      ref="chatBox"
+      type="text"
+      class="form-control"
+      v-model="chatInput"
+      placeholder="Type your message..."
+    />
+    <button
+      @click="postMessageHandler"
+      :disabled="!chatInput.length"
+      class="btn btn-primary"
+      type="button"
+    >
+      Post
+    </button>
+  </div>
+
+  <button
+    @click="isDeleteAllModalOpen = true"
+    :disabled="!messagesData.length"
+    class="btn btn-outline-danger"
+  >
+    Delete All
+  </button>
+  <button
+    v-if="checkedMessagesIds.length"
+    @click="isDeleteSelectedModalOpen = true"
+    class="btn btn-outline-danger"
+  >
     Delete Selected
   </button>
-  <button :disabled="!messagesData.length" @click="toggleSort">Sort - {{ sortBy }}</button>
+  <button @click="toggleSort" :disabled="!messagesData.length" class="btn btn-outline-secondary">
+    Sort - {{ sortBy }}
+  </button>
 
   <template v-if="isLoadingData">
     <h1>Loading...</h1>
@@ -134,14 +184,27 @@ onMounted(() => {
 
   <template v-else>
     <div v-if="!messagesData.length">Looks empty!</div>
-    <div v-for="message in messagesData" :key="message.id">
-      <input
-        type="checkbox"
-        :checked="isMessageChecked(message.id)"
-        @change="toggleCheckbox(message.id)"
-      />
-      {{ message.text }}
-      <button @click="deleteMessageHandler(message.id)">Delete</button>
+    <div class="d-flex flex-column gap-3 mt-4">
+      <div v-for="message in messagesData" :key="message.id" class="p-3 border border-dark-subtle">
+        <div class="d-flex align-items-center">
+          <input
+            type="checkbox"
+            :checked="isMessageChecked(message.id)"
+            @change="toggleCheckbox(message.id)"
+          />
+          <p class="fw-semibold px-2 mb-0">{{ message.source }}</p>
+          <button
+            @click="deleteMessageHandler(message.id)"
+            class="btn btn-outline-danger btn-sm ml-auto"
+          >
+            Delete
+          </button>
+        </div>
+
+        <p class="px-3 mt-1 mb-0">{{ message.text }}</p>
+
+        <p class="w-fit ml-auto mb-0 fw-light">{{ formatRelativeTime(message.timestamp) }}</p>
+      </div>
     </div>
 
     <DeleteAllAlertModal
@@ -157,4 +220,12 @@ onMounted(() => {
   </template>
 </template>
 
-<style scoped></style>
+<style scoped>
+.ml-auto {
+  margin-left: auto;
+}
+
+.w-fit {
+  width: fit-content;
+}
+</style>
