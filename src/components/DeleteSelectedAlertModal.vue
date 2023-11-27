@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { onClickOutside } from '@vueuse/core'
+
 defineProps<{
   isOpen: boolean
 }>()
@@ -8,46 +11,71 @@ const emits = defineEmits<{
   (event: 'deleteSelectedMessages'): void
 }>()
 
+const modal = ref()
+
 function closeModal() {
   emits('close')
 }
 
-function confirmActionHandler() {
+function deleteActionHandler() {
   emits('deleteSelectedMessages')
   closeModal()
 }
+
+// Close the Modal on clicking anywhere outside the modal component
+onClickOutside(modal, closeModal)
 </script>
 
 <template>
-  <div v-if="isOpen" class="modal">
-    <div class="modal-bg" @click="closeModal"></div>
-    <div class="modal-card">
-      <h1>Are you sure you want to delete all the selected messages</h1>
-      <button @click="closeModal">Cancel</button><button @click="confirmActionHandler">Yes</button>
+  <div
+    ref="modal"
+    v-if="isOpen"
+    class="alert-modal border border-dark-subtle rounded-1 p-3 bg-light"
+  >
+    <div class="alert-modal-header">
+      <h5>Delete Selected Messages</h5>
+      <button
+        @click="closeModal"
+        type="button"
+        class="btn-close ml-auto"
+        aria-label="Close"
+      ></button>
+    </div>
+    <div class="mt-1">
+      <p>Are you sure you want to delete the selected messages?</p>
+    </div>
+    <div class="alert-modal-footer w-fit ml-auto">
+      <button @click="closeModal" type="button" class="btn btn-secondary">Close</button>
+      <button @click="deleteActionHandler" type="button" class="btn btn-danger">Delete</button>
     </div>
   </div>
 </template>
 
 <style scoped>
-.modal {
+.alert-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100vw;
+  top: 45%;
+  left: 20%;
+  width: 60%;
+  max-width: 500px;
+  height: fit-content;
 }
 
-.modal-bg {
-  height: 100%;
-  width: 100%;
-  background: #000000/0.8;
+.alert-modal-header {
+  display: flex;
+  align-items: center;
 }
 
-.modal-card {
-  position: absolute;
-  top: 5%;
-  z-index: 100;
-  min-width: 496px;
-  padding: 48px;
+.alert-modal-footer {
+  display: flex;
+  gap: 10px;
+}
+
+.ml-auto {
+  margin-left: auto;
+}
+
+.w-fit {
+  width: fit-content;
 }
 </style>
