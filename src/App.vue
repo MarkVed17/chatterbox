@@ -14,6 +14,7 @@ const isLoadingData = ref(false) // Loading State
 const checkedMessagesIds = ref<number[]>([]) // Store all the checked messages id
 const isDeleteAllModalOpen = ref(false) // Delete All Messages Alert Modal state
 const isDeleteSelectedModalOpen = ref(false) // Delete Selected Messages Alert Modal state
+const sortBy = ref('Oldest to Newest') // Sort Messages by timestamp state
 
 // Fetch All the Messages
 async function fetchMessagesData() {
@@ -97,6 +98,21 @@ function toggleCheckbox(messageId: number) {
   }
 }
 
+// Toggle for Sorting by Timestamp ('Newest to Oldest' OR 'Oldest to Newest' )
+function toggleSort() {
+  sortBy.value = sortBy.value === 'Newest to Oldest' ? 'Oldest to Newest' : 'Newest to Oldest'
+
+  if (sortBy.value === 'Oldest to Newest') {
+    messagesData.value = messagesData.value.sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    )
+  } else {
+    messagesData.value = messagesData.value.sort(
+      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    )
+  }
+}
+
 onMounted(() => {
   fetchMessagesData()
 })
@@ -110,6 +126,7 @@ onMounted(() => {
   <button v-if="checkedMessagesIds.length" @click="isDeleteSelectedModalOpen = true">
     Delete Selected
   </button>
+  <button :disabled="!messagesData.length" @click="toggleSort">Sort - {{ sortBy }}</button>
 
   <template v-if="isLoadingData">
     <h1>Loading...</h1>
