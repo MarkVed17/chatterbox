@@ -1,4 +1,4 @@
-import type { PostMessageBody } from '@/types/services.type'
+import type { PostMessageBody } from '@/types/services'
 
 export default async function postMessage(message: PostMessageBody) {
   try {
