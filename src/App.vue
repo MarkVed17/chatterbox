@@ -15,7 +15,7 @@ const isLoadingData = ref(false) // Loading State
 const checkedMessagesIds = ref<number[]>([]) // Store all the checked messages id
 const isDeleteAllModalOpen = ref(false) // Delete All Messages Alert Modal state
 const isDeleteSelectedModalOpen = ref(false) // Delete Selected Messages Alert Modal state
-const sortBy = ref('Oldest to Newest') // Sort Messages by timestamp state
+const sortBy = ref('Newest to Oldest') // Sort Messages by timestamp state
 
 // Fetch All the Messages
 async function fetchMessagesData() {
