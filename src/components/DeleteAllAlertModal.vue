@@ -51,31 +51,4 @@ onClickOutside(modal, closeModal)
   </div>
 </template>
 
-<style scoped>
-.alert-modal {
-  position: fixed;
-  top: 45%;
-  left: 20%;
-  width: 60%;
-  max-width: 500px;
-  height: fit-content;
-}
-
-.alert-modal-header {
-  display: flex;
-  align-items: center;
-}
-
-.alert-modal-footer {
-  display: flex;
-  gap: 10px;
-}
-
-.ml-auto {
-  margin-left: auto;
-}
-
-.w-fit {
-  width: fit-content;
-}
-</style>
+<style scoped></style>
