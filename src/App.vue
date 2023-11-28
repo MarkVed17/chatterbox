@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import getAllMessages from '@/services/getAllMessages.service'
 import postMessage from '@/services/postMessage.service'
 import deleteMessage from '@/services/deleteMessage.service'
 import DeleteAllAlertModal from './components/DeleteAllAlertModal.vue'
 import DeleteSelectedAlertModal from './components/DeleteSelectedAlertModal.vue'
+import CustomPagination from './components/CustomPagination.vue'
 import type { Message } from '@/types/message'
 
 const chatInput = ref('') // Text Input
@@ -135,6 +136,31 @@ function formatRelativeTime(timestamp: string) {
   }
 }
 
+// Pagination
+const page = ref(1)
+
+const perPage = 5
+
+const paginatedData = computed(() =>
+  messagesData.value.slice((page.value - 1) * perPage, page.value * perPage)
+)
+
+const nextPage = () => {
+  if (page.value !== Math.ceil(messagesData.value.length / perPage)) {
+    page.value += 1
+  }
+}
+
+const prevPage = () => {
+  if (page.value !== 1) {
+    page.value -= 1
+  }
+}
+
+const goToPage = (numPage: number) => {
+  page.value = numPage
+}
+
 onMounted(() => {
   fetchMessagesData()
 })
@@ -160,32 +186,38 @@ onMounted(() => {
     </button>
   </div>
 
-  <button
-    @click="isDeleteAllModalOpen = true"
-    :disabled="!messagesData.length"
-    class="btn btn-outline-danger"
-  >
-    Delete All
-  </button>
-  <button
-    v-if="checkedMessagesIds.length"
-    @click="isDeleteSelectedModalOpen = true"
-    class="btn btn-outline-danger"
-  >
-    Delete Selected
-  </button>
-  <button @click="toggleSort" :disabled="!messagesData.length" class="btn btn-outline-secondary">
-    Sort - {{ sortBy }}
-  </button>
+  <div class="d-flex gap-2">
+    <button
+      @click="isDeleteAllModalOpen = true"
+      :disabled="!messagesData.length"
+      class="btn btn-outline-danger"
+    >
+      Delete All
+    </button>
+    <button
+      v-if="checkedMessagesIds.length"
+      @click="isDeleteSelectedModalOpen = true"
+      class="btn btn-outline-danger"
+    >
+      Delete Selected
+    </button>
+    <button @click="toggleSort" :disabled="!messagesData.length" class="btn btn-outline-secondary">
+      Sort - {{ sortBy }}
+    </button>
+  </div>
 
   <template v-if="isLoadingData">
     <h1>Loading...</h1>
   </template>
 
   <template v-else>
-    <div v-if="!messagesData.length">Looks empty!</div>
+    <h5 v-if="!messagesData.length" class="mt-4 fw-normal">Looks empty! Post a message first</h5>
     <div class="d-flex flex-column gap-3 mt-4">
-      <div v-for="message in messagesData" :key="message.id" class="p-3 border border-dark-subtle">
+      <div
+        v-for="message in paginatedData"
+        :key="message.id"
+        class="p-3 bg-light bg-gradient border border-dark-subtle"
+      >
         <div class="d-flex align-items-center">
           <input
             type="checkbox"
@@ -217,15 +249,16 @@ onMounted(() => {
       @close="isDeleteSelectedModalOpen = false"
       @delete-selected-messages="deleteSelectedMessages"
     />
+
+    <CustomPagination
+      v-if="messagesData.length"
+      :data-count="messagesData.length"
+      :per-page="perPage"
+      @prev-page="prevPage"
+      @next-page="nextPage"
+      @go-to-page="goToPage"
+    />
   </template>
 </template>
 
-<style scoped>
-.ml-auto {
-  margin-left: auto;
-}
-
-.w-fit {
-  width: fit-content;
-}
-</style>
+<style scoped></style>
