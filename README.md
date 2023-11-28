@@ -26,6 +26,14 @@ See [Vite Configuration Reference](https://vitejs.dev/config/).
 npm install
 ```
 
+### Configuration
+
+The app is configured using the following environment variables:
+- `VITE_API_BASE_URL` - API Base URL
+- `VITE_AUTHORIZATION_TOKEN` - Authorization Token
+
+Refer [example](./.env.example) for more details and add an `.env` file in the root directory
+
 ### Compile and Hot-Reload for Development
 
 ```sh
