@@ -171,6 +171,7 @@ onMounted(() => {
   <div class="input-group mb-3">
     <input
       ref="chatBox"
+      @keyup.enter="postMessageHandler"
       type="text"
       class="form-control"
       v-model="chatInput"
